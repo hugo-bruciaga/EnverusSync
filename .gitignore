@@ -1,0 +1,27 @@
+
+app/EnverusSync/EnverusSync.cfg
+/db/EnverusSync/.vs
+app/EnverusSync/.idea/.name
+db/EnverusSync/bin/Debug/EnverusSync.dll
+db/EnverusSync/bin/Debug/EnverusSync.pdb
+db/EnverusSync/bin/Debug/EnverusSync.sql
+db/EnverusSync/dbsetup/Create EnverusSync Database.sql
+db/EnverusSync/dbsetup/dbsetup.ps1
+db/EnverusSync/dbsetup/EnverusSync.dacpac
+db/EnverusSync/dbsetup/EnverusSync.dbsetup.sql
+db/EnverusSync/dbsetup/EnverusSync.dbsetup.xml
+db/EnverusSync/dbsetup/sqlpackage.zip
+db/EnverusSync/EnverusSync.dbmdl
+db/EnverusSync/EnverusSync.jfm
+db/EnverusSync/EnverusSync.sln
+db/EnverusSync/EnverusSync.sqlproj
+db/EnverusSync/EnverusSync.sqlproj.user
+db/EnverusSync/obj/Debug/EnverusSync.dll
+db/EnverusSync/obj/Debug/EnverusSync.pdb
+db/EnverusSync/obj/Debug/EnverusSync.sqlproj.AssemblyReference.cache
+db/EnverusSync/obj/Debug/EnverusSync.sqlproj.FileListAbsolute.txt
+db/EnverusSync/obj/Debug/Model.xml
+db/EnverusSync/Publish Profiles/TEST.EnverusSync.publish.publish.xml
+db/EnverusSync/Schema Comparison/EDW_Stage.SqlSchemaCompare.scmp
+db/EnverusSync/Schemas/data/data.sql
+*.sql

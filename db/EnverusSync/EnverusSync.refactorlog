@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="97cdd2dd-f324-4a83-a74c-31ed48ebe78e" ChangeDateTime="01/10/2025 17:03:20">
+    <Property Name="ElementName" Value="[dbo].[Table1].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table1]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="bucket" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="84637c9a-1795-4aa6-91bf-df57eafaffad" ChangeDateTime="01/10/2025 17:03:59">
+    <Property Name="ElementName" Value="[dbo].[Table1].[min_producing]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table1]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="min_producing_month" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c8315643-aba1-4f00-a4cd-4028709dd362" ChangeDateTime="01/10/2025 17:05:07">
+    <Property Name="ElementName" Value="[dbo].[Production_Month_Buckets].[bucket]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Production_Month_Buckets]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="bucket_number" />
+  </Operation>
+</Operations>
