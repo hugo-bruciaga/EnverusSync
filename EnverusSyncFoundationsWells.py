@@ -115,38 +115,22 @@ def sp_save(batch_size, table_name, unique_cols, stored_procedure, filter):
     while is_empty is False:
         start_r = time.time()
 
-        if table_name != 'Foundations_FullDirectionalSurvey':
+        if table_name == 'Foundations_Wells':
 
             sql = (f"SELECT * FROM {schema_name}.{table_name}\n "
                    f" WHERE {filter}\n"
                    f"   AND DeletedDate IS NULL\n"
-                   f"   AND '{table_name}' = (select dataset from {schema_name}.Dataset_Info where dataset = '{table_name}' and last_updated_date > dateadd(day, {rolling_window}, getdate()))\n"
-                   f" ORDER BY {unique_cols}\n "
-                   f"OFFSET {batch_index} ROWS FETCH NEXT {batch_size} ROWS ONLY\n"
                    )
-
         else:
-            print("Foundations_FullDirectionalSurvey is going to be processed by a different script")
+            log_file("this job only process: Foundations Wells")
             sql = (f"SELECT * FROM {schema_name}.{table_name}\n "
                    f" WHERE 1=0")
-            '''
-            sql = (f"SELECT API_UWI,API_UWI_Unformatted,API_UWI_12,API_UWI_12_Unformatted,Azimuth_DEG,Closure_FT,CoordinateSource,Country,County,Course_FT,DeletedDate,DogLegSeverity_DEGPer100FT,E_W,ENVBasin,ENVInterval,ENVPlay,ENVRegion"
-                   # f",GeomXYZ_Point,GridX_FT,GridY_FT"
-                   f",null GridX_FT,null GridY_FT"
-                   f",Inclination_DEG,Latitude,Longitude,MeasuredDepth_FT,N_S,StateProvince,StationNumber,SubseaElevation_FT,TVD_FT,UpdatedDate,VerticalSection_FT,WellId,X_ECEF,Y_ECEF,Z_ECEF"
-                   f" FROM {schema_name}.Foundations_FullDirectionalSurvey\n "
-                   f" WHERE {filter}"
-                   f"   AND DeletedDate IS NULL\n"
-                   f"   AND '{table_name}' = (select dataset from {schema_name}.Dataset_Info where dataset = '{table_name}' and last_updated_date > dateadd(day, {rolling_window}, getdate()))\n"
-                   f" ORDER BY {unique_cols}\n "
-                   f"OFFSET {batch_index} ROWS FETCH NEXT {batch_size} ROWS ONLY\n"
-                   )
-            '''
 
         if log_query == 'Yes':
             log_file(sql)
 
-        data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchall()))
+        # data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchall()))
+        data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchmany()))
 
         log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), batch_index, 'Time Elapsed Reading:',
                  datetime.timedelta(seconds=time.time() - start_r))
@@ -175,47 +159,6 @@ def sp_save(batch_size, table_name, unique_cols, stored_procedure, filter):
         batch_index += batch_size
 
     log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'Completed', f'{table_name}')
-
-
-'''
-def send_email_stats(ds):
-    html_code = """
-            <!doctype html>
-        <html>
-        <head>
-        <meta charset="utf-8">
-        <title>Untitled Document</title>
-        <body>
-            <table border='1'
-            <tr>
-                <th>Table Name</th>
-                <th>Count</th>
-            </tr>"""
-    for r in ds:
-        html_code = html_code + """
-            <tr>
-                <td>{}</td>
-                <td>{}</td>
-            </tr>""".format(r[0], r[1], r[2], r[3])
-    html_code = html_code + "</table></body></html>"
-    # log_file(html_code)
-
-    if len(html_code) > 0:
-        msg = MIMEMultipart('alternative')
-        msg.attach(MIMEText(html_code, 'html'))
-
-        msg['Subject'] = parser.get("email", "Subject")
-        msg['From'] = parser.get("email", "From")
-        msg['To'] = parser.get("email", "To")
-
-        # Send the message via our own SMTP server.
-        host = parser.get("email", "Host")
-        s = smtplib.SMTP(host)
-        s.send_message(msg)
-        s.quit()
-    else:
-        log_file("No Message to send.")
-'''
 
 
 def sp_counts(table_name, filter):
