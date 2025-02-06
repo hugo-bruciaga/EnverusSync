@@ -43,7 +43,7 @@ env_pw = parser.get("database", "env_pw")
 ar_srv = parser.get("database", "ar_srv")
 ar_db = parser.get("database", "ar_db")
 schema_name = parser.get("database", "schema_name")
-rolling_window = parser.get("input", "rolling_window")
+# rolling_window = parser.get("input", "rolling_window")
 # sync_tables = parser.get("input", "sync_tables")
 sync_tables = ''
 log_query = parser.get("input", "log_query")
@@ -130,7 +130,7 @@ def sp_save(batch_size, table_name, unique_cols, stored_procedure, filter):
             log_file(sql)
 
         # data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchall()))
-        data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchmany()))
+        data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchmany(batch_size)))
 
         log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), batch_index, 'Time Elapsed Reading:',
                  datetime.timedelta(seconds=time.time() - start_r))
@@ -205,13 +205,7 @@ if __name__ == "__main__":
         log_file("------------------------------------------------------------")
         log_file('PROCESSING TABLE:', sync_tables)
         log_file("------------------------------------------------------------")
-        '''
-        ret = main()
-        if ret > 0:
-            sys.exit(1)
-        else:
-            sys.exit(0)
-        '''
+
         try_count = 1
         passed = False
         while try_count <= 5 and passed is False:
