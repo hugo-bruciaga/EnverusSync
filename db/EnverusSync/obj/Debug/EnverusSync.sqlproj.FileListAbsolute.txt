@@ -1,0 +1,10 @@
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\bin\Debug\EnverusSync.dacpac
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\bin\Debug\EnverusSync.dll
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\bin\Debug\EnverusSync.pdb
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\obj\Debug\EnverusSync.sqlproj.AssemblyReference.cache
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\obj\Debug\EnverusSync.dll
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\obj\Debug\EnverusSync.pdb
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\obj\Debug\Model.xml
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\obj\Debug\refactor.xml
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\obj\Debug\postdeploy.sql
+C:\Users\hbruciaga\source\repos\EnverusSync\db\EnverusSync\obj\Debug\predeploy.sql

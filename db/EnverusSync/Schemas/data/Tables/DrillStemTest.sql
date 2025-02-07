@@ -1,0 +1,56 @@
+﻿CREATE TABLE data.DrillStemTest (
+    [API_UWI]                        VARCHAR (32)  NULL,
+    [API_UWI_Unformatted]            VARCHAR (32)  NULL,
+    [API_UWI_12]                     VARCHAR (32)  NULL,
+    [API_UWI_12_Unformatted]         VARCHAR (32)  NULL,
+    [ChokeSize]                      FLOAT (53)    NULL,
+    [Cushion]                        FLOAT (53)    NULL,
+    [Cushion_UOM]                    VARCHAR (256) NULL,
+    [CushionType]                    VARCHAR (256) NULL,
+    [DeletedDate]                    DATETIME      NULL,
+    [DepthReference]                 VARCHAR (256) NULL,
+    [DSTID]                          INT           NOT NULL,
+    [DSTIndex]                       BIGINT        NULL,
+    [EndDepth_FT]                    FLOAT (53)    NULL,
+    [FinalFlowPressure_PSI]          FLOAT (53)    NULL,
+    [FinalHydrostaticPressure_PSI]   FLOAT (53)    NULL,
+    [FinalShutInPressure_PSI]        FLOAT (53)    NULL,
+    [FlowComments]                   VARCHAR (MAX) NULL,
+    [FlowID]                         INT           NOT NULL,
+    [FlowIndex]                      BIGINT        NULL,
+    [FlowPressure_UOM]               VARCHAR (256) NULL,
+    [Formation]                      VARCHAR (256) NULL,
+    [HeaderComments]                 VARCHAR (256) NULL,
+    [InitialFlowPressure_PSI]        FLOAT (53)    NULL,
+    [InitialHydrostaticPressure_PSI] FLOAT (53)    NULL,
+    [InitialShutInPressure_PSI]      FLOAT (53)    NULL,
+    [Misrun]                         VARCHAR (256) NULL,
+    [Narrative]                      VARCHAR (MAX) NULL,
+    [OilGravity_DEG]                 FLOAT (53)    NULL,
+    [OilTemperature_F]               FLOAT (53)    NULL,
+    [PressureBH_PSI]                 FLOAT (53)    NULL,
+    [RecoveredAmount]                FLOAT (53)    NULL,
+    [RecoveredAmount_UOM]            VARCHAR (256) NULL,
+    [RecoveredType]                  VARCHAR (256) NULL,
+    [RecoveryComments]               VARCHAR (MAX) NULL,
+    [RecoveryID]                     INT           NOT NULL,
+    [RecoveryIndex]                  BIGINT        NULL,
+    [RecoveryPositionCode]           VARCHAR (256) NULL,
+    [StartDepth_FT]                  FLOAT (53)    NULL,
+    [TemperatureBH_F]                FLOAT (53)    NULL,
+    [TestType]                       VARCHAR (256) NULL,
+    [TimeOpen_MIN]                   FLOAT (53)    NULL,
+    [TimeShutIn_MIN]                 FLOAT (53)    NULL,
+    [TimeToSurface_MIN]              FLOAT (53)    NULL,
+    [UpdatedDate]                    DATETIME      NULL,
+    [WellID]                         BIGINT        NOT NULL,
+    [ETL_Load_Date]                  DATETIME      NULL,
+    constraint pk_data_DrillStemTest_WellID_DSTID_FlowID_RecoveryID primary key clustered (WellID,DSTID,FlowID,RecoveryID)
+);
+
+
+GO
+
+CREATE NONCLUSTERED INDEX [idx_data_DrillStemTest_WellID_DSTID_FlowID_RecoveryID]
+    ON data.[DrillStemTest](WellID,DSTID,FlowID,RecoveryID);
+

@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{122EB0BE-C691-4725-A5F2-295A41F53EEA}|EnverusSync.sqlproj|C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\Schemas\\sync\\Stored Procedures\\spSaveProduction.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{122EB0BE-C691-4725-A5F2-295A41F53EEA}|EnverusSync.sqlproj|solutionrelative:Schemas\\sync\\Stored Procedures\\spSaveProduction.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{122EB0BE-C691-4725-A5F2-295A41F53EEA}|EnverusSync.sqlproj|C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\Schemas\\data\\Tables\\SaveLog.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{122EB0BE-C691-4725-A5F2-295A41F53EEA}|EnverusSync.sqlproj|solutionrelative:Schemas\\data\\Tables\\SaveLog.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{122EB0BE-C691-4725-A5F2-295A41F53EEA}|EnverusSync.sqlproj|C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\Schemas\\sync\\Stored Procedures\\spSaveProduction.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame",
+      "RelativeMoniker": "D:0:0:{122EB0BE-C691-4725-A5F2-295A41F53EEA}|EnverusSync.sqlproj|solutionrelative:Schemas\\sync\\Stored Procedures\\spSaveProduction.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SaveLog.sql",
+              "DocumentMoniker": "C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\Schemas\\data\\Tables\\SaveLog.sql",
+              "RelativeDocumentMoniker": "Schemas\\data\\Tables\\SaveLog.sql",
+              "ToolTip": "C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\Schemas\\data\\Tables\\SaveLog.sql\r\n(localdb)\\ProjectModels.EnverusSync\r\n(ANTERO\\hbruciaga)",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-01-17T17:29:45.985Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "spSaveProduction.sql ",
+              "DocumentMoniker": "C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\Schemas\\sync\\Stored Procedures\\spSaveProduction.sql",
+              "RelativeDocumentMoniker": "Schemas\\sync\\Stored Procedures\\spSaveProduction.sql",
+              "ToolTip": "C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\db\\EnverusSync\\Schemas\\sync\\Stored Procedures\\spSaveProduction.sql\r\n(localdb)\\ProjectModels.EnverusSync\r\n(ANTERO\\hbruciaga)",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-01-16T16:39:15.793Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

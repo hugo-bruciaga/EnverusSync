@@ -1,0 +1,716 @@
+﻿/***********************************************************************************
+
+	Procedure Name:		sync.spProduction
+	Author:				Enterprise Database Development Team
+	______________________________________________________________________________
+
+	Purpose:			
+	  TODO: Add text to describe the purpose of the procedure
+
+	Parameters:
+	  @Param1 (varchar 128)
+		Description goes here
+
+	  @Param2 (varchar 128)
+		Description goes here
+
+	Returns:
+	  TODO: Add help text to describe any return values and/or result sets
+
+	Remarks:
+	  TODO: Add help text to provide more detailed usage instructions
+
+	Example:
+	  TODO: Add examples of calling and using the stored procedure
+	______________________________________________________________________________
+
+***********************************************************************************/
+CREATE PROCEDURE sync.spSaveProduction (
+	 @data			VARCHAR(MAX)
+	,@NoOutput		BIT				= 0
+)
+AS
+BEGIN
+	SET XACT_ABORT ON
+	SET NOCOUNT ON
+	/*
+	--TODO: Comment this section out... only used for troubleshooting...
+	INSERT INTO dbo.SaveLog(SavedBy, SavedData)
+	VALUES (SUSER_SNAME(), @data)
+	*/
+	--------------------------------------------------------------------------------
+	-- Variable Declaration
+	--------------------------------------------------------------------------------
+		DECLARE
+			 @ErrPos			VARCHAR(512)	= ''
+			,@ErrMsg			VARCHAR(2048)	= ''
+			,@MsgTitle			VARCHAR(256)	= CONCAT('Execute ', OBJECT_SCHEMA_NAME(@@procid), '.', OBJECT_NAME(@@procid))
+	
+		-- Parameter Override
+		SELECT @NoOutput = COALESCE(@NoOutput, 0)
+
+	--------------------------------------------------------------------------------
+	-- BEGIN TRY... CATCH
+	--------------------------------------------------------------------------------
+		BEGIN TRY
+			PRINT CONCAT(SYSDATETIME(),' | INFO | ',@MsgTitle, '; *** Started ***')
+
+			------------------------------------------------------------------------
+			-- Validate Parameters
+			------------------------------------------------------------------------
+
+				SET @ErrPos = CONCAT(@MsgTitle, '; Validate parameters')
+				PRINT CONCAT(SYSDATETIME(),' | INFO | ',@ErrPos)
+
+				  -- @data
+				  PRINT CONCAT(SYSDATETIME(),' | INFO | ',@ErrPos,'; @data')
+			  	  IF ISJSON(@data) = 0
+				  BEGIN
+				      SET @ErrMsg = 'The @data must be a well formed JSON structure';
+					  THROW 2147483647,@ErrMsg,1;
+				  END
+  
+			------------------------------------------------------------------------
+			-- Initialize procedure resources
+			------------------------------------------------------------------------
+				SET @ErrPos = concat(@MsgTitle, '; Initialize procedure resources')
+				PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+				  -- #Production
+				  PRINT concat(sysdatetime(),' | INFO | ',@ErrPos,'; #Production')
+			  
+				  DROP TABLE IF EXISTS #Production
+				  CREATE TABLE #Production (
+					 _row_id							BIGINT IDENTITY(1,1)	NOT NULL	PRIMARY KEY CLUSTERED
+					,_delete							BIT				NULL
+					,_duplicate							BIT				NULL
+					,_error								BIT				NULL
+					,_message							VARCHAR			NULL
+																		
+					,API_UWI							VARCHAR(32)		NULL
+					,API_UWI_Unformatted				VARCHAR(32)		NULL
+					,API_UWI_14							VARCHAR(32)		NULL
+					,API_UWI_14_Unformatted				VARCHAR(32)		NULL
+					,CDFlaredGas_MCFPerDAY				REAL			NULL
+					,CDGas_MCFPerDAY					FLOAT(53)		NULL
+					,CDInjectionGas_MCFPerDAY			FLOAT(53)		NULL
+					,CDInjectionOther_BBLPerDAY			FLOAT(53)		NULL
+					,CDInjectionSolvent_BBLPerDAY		FLOAT(53)		NULL
+					,CDInjectionSteam_BBLPerDAY			FLOAT(53)		NULL
+					,CDInjectionWater_BBLPerDAY			FLOAT(53)		NULL
+					,CDLiquids_BBLPerDAY				FLOAT(53)		NULL
+					,CDProd_BOEPerDAY					FLOAT(53)		NULL
+					,CDProd_MCFEPerDAY					FLOAT(53)		NULL
+					,CDRepGas_MCFPerDAY					REAL			NULL
+					,CDWater_BBLPerDAY					FLOAT(53)		NULL
+					,CompletionID						BIGINT			NULL
+					,Country							VARCHAR(2)		NULL
+					,County								VARCHAR(32)		NULL
+					,CumFlaredGas_MCF					REAL			NULL
+					,CumGas_MCF							REAL			NULL
+					,CumLiquids_BBL						REAL			NULL
+					,CumProd_BOE						REAL			NULL
+					,CumProd_MCFE						REAL			NULL
+					,CumRepGas_MCF						REAL			NULL
+					,CumWater_BBL						REAL			NULL
+					,DeletedDate						DATETIME		NULL
+					,ENVBasin							VARCHAR(64)		NULL
+					,ENVInterval						VARCHAR(128)	NULL
+					,ENVPlay							VARCHAR(128)	NULL
+					,ENVProdID							TINYINT			NULL
+					,ENVRegion							VARCHAR(32)		NULL
+					,FlaredGasProd_MCF					REAL			NULL
+					,GasProd_MCF						FLOAT(53)		NULL
+					,InjectionGas_MCF					FLOAT(53)		NULL
+					,InjectionOther_BBL					FLOAT(53)		NULL
+					,InjectionSolvent_BBL				FLOAT(53)		NULL
+					,InjectionSteam_BBL					FLOAT(53)		NULL
+					,InjectionWater_BBL					FLOAT(53)		NULL
+					,LiquidsProd_BBL					FLOAT(53)		NULL
+					,PDFlaredGas_MCFPerDAY				FLOAT(53)		NULL
+					,PDGas_MCFPerDAY					FLOAT(53)		NULL
+					,PDLiquids_BBLPerDAY				FLOAT(53)		NULL
+					,PDProd_BOEPerDAY					FLOAT(53)		NULL
+					,PDProd_MCFEPerDAY					FLOAT(53)		NULL
+					,PDRepGas_MCFPerDAY					FLOAT(53)		NULL
+					,PDWater_BBLPerDAY					FLOAT(53)		NULL
+					,Prod_BOE							FLOAT(53)		NULL
+					,Prod_CondensateBBL					REAL			NULL
+					,Prod_MCFE							FLOAT(53)		NULL
+					,Prod_OilBBL						FLOAT(53)		NULL
+					,ProducingDays						FLOAT(53)		NULL
+					,ProducingMonth						DATETIME		NULL
+					,ProducingOperator					VARCHAR(256)	NULL
+					,ProductionID						BIGINT			NOT NULL
+					,ProductionReportedMethod			VARCHAR(16)		NULL
+					,RepGasProd_MCF						REAL			NULL
+					,StateProvince						VARCHAR(64) 	NULL
+					,TotalCompletionMonths				INT		  		NULL
+					,TotalProdMonths					INT		  		NULL
+					,UpdatedDate						DATETIME		NULL
+					,WaterProd_BBL						FLOAT(53)		NULL
+					,WellID								BIGINT			NULL
+																	
+					,ETL_Load_Date						DATETIME		NULL
+				  
+					,INDEX idx_tempdb_Production_ProductionID
+						NONCLUSTERED (
+							ProductionID
+						)
+				  )
+
+			------------------------------------------------------------------------
+			-- Save Production data
+			------------------------------------------------------------------------
+				SET @ErrPos = concat(@MsgTitle, '; Save Production data')
+				PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+				--------------------------------------------------------------------
+				-- Unpack Production JSON
+				--------------------------------------------------------------------
+					SET @ErrPos = concat(@MsgTitle, '; Unpack Production JSON')
+					PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+					INSERT INTO #Production (
+						 _duplicate
+						,_error
+						,_delete
+
+						,API_UWI							
+						,API_UWI_Unformatted				
+						,API_UWI_14							
+						,API_UWI_14_Unformatted				
+						,CDFlaredGas_MCFPerDAY				
+						,CDGas_MCFPerDAY					
+						,CDInjectionGas_MCFPerDAY			
+						,CDInjectionOther_BBLPerDAY			
+						,CDInjectionSolvent_BBLPerDAY		
+						,CDInjectionSteam_BBLPerDAY			
+						,CDInjectionWater_BBLPerDAY			
+						,CDLiquids_BBLPerDAY				
+						,CDProd_BOEPerDAY					
+						,CDProd_MCFEPerDAY					
+						,CDRepGas_MCFPerDAY					
+						,CDWater_BBLPerDAY					
+						,CompletionID						
+						,Country							
+						,County								
+						,CumFlaredGas_MCF					
+						,CumGas_MCF							
+						,CumLiquids_BBL						
+						,CumProd_BOE						
+						,CumProd_MCFE						
+						,CumRepGas_MCF						
+						,CumWater_BBL						
+						,DeletedDate						
+						,ENVBasin							
+						,ENVInterval						
+						,ENVPlay							
+						,ENVProdID							
+						,ENVRegion							
+						,FlaredGasProd_MCF					
+						,GasProd_MCF						
+						,InjectionGas_MCF					
+						,InjectionOther_BBL					
+						,InjectionSolvent_BBL				
+						,InjectionSteam_BBL					
+						,InjectionWater_BBL					
+						,LiquidsProd_BBL					
+						,PDFlaredGas_MCFPerDAY				
+						,PDGas_MCFPerDAY					
+						,PDLiquids_BBLPerDAY				
+						,PDProd_BOEPerDAY					
+						,PDProd_MCFEPerDAY					
+						,PDRepGas_MCFPerDAY					
+						,PDWater_BBLPerDAY					
+						,Prod_BOE							
+						,Prod_CondensateBBL					
+						,Prod_MCFE							
+						,Prod_OilBBL						
+						,ProducingDays						
+						,ProducingMonth						
+						,ProducingOperator					
+						,ProductionID						
+						,ProductionReportedMethod			
+						,RepGasProd_MCF						
+						,StateProvince						
+						,TotalCompletionMonths				
+						,TotalProdMonths					
+						,UpdatedDate						
+						,WaterProd_BBL						
+						,WellID
+
+						,ETL_Load_Date
+						)
+					SELECT
+						 _duplicate = count(*) OVER (PARTITION BY t0.ProductionID)-1
+						,_error		= 0
+						,*
+						,sysdatetime()
+					FROM
+						OPENJSON(@data)
+						WITH (
+							 _delete							BIT
+
+							,API_UWI							VARCHAR(32)		
+							,API_UWI_Unformatted				VARCHAR(32)		
+							,API_UWI_14							VARCHAR(32)		
+							,API_UWI_14_Unformatted				VARCHAR(32)		
+							,CDFlaredGas_MCFPerDAY				REAL			
+							,CDGas_MCFPerDAY					FLOAT(53)		
+							,CDInjectionGas_MCFPerDAY			FLOAT(53)		
+							,CDInjectionOther_BBLPerDAY			FLOAT(53)		
+							,CDInjectionSolvent_BBLPerDAY		FLOAT(53)		
+							,CDInjectionSteam_BBLPerDAY			FLOAT(53)		
+							,CDInjectionWater_BBLPerDAY			FLOAT(53)		
+							,CDLiquids_BBLPerDAY				FLOAT(53)		
+							,CDProd_BOEPerDAY					FLOAT(53)		
+							,CDProd_MCFEPerDAY					FLOAT(53)		
+							,CDRepGas_MCFPerDAY					REAL			
+							,CDWater_BBLPerDAY					FLOAT(53)		
+							,CompletionID						BIGINT			
+							,Country							VARCHAR(2)		
+							,County								VARCHAR(32)		
+							,CumFlaredGas_MCF					REAL			
+							,CumGas_MCF							REAL			
+							,CumLiquids_BBL						REAL			
+							,CumProd_BOE						REAL			
+							,CumProd_MCFE						REAL			
+							,CumRepGas_MCF						REAL			
+							,CumWater_BBL						REAL			
+							,DeletedDate						DATETIME		
+							,ENVBasin							VARCHAR(64)		
+							,ENVInterval						VARCHAR(128)	
+							,ENVPlay							VARCHAR(128)	
+							,ENVProdID							TINYINT			
+							,ENVRegion							VARCHAR(32)		
+							,FlaredGasProd_MCF					REAL			
+							,GasProd_MCF						FLOAT(53)		
+							,InjectionGas_MCF					FLOAT(53)		
+							,InjectionOther_BBL					FLOAT(53)		
+							,InjectionSolvent_BBL				FLOAT(53)		
+							,InjectionSteam_BBL					FLOAT(53)		
+							,InjectionWater_BBL					FLOAT(53)		
+							,LiquidsProd_BBL					FLOAT(53)		
+							,PDFlaredGas_MCFPerDAY				FLOAT(53)		
+							,PDGas_MCFPerDAY					FLOAT(53)		
+							,PDLiquids_BBLPerDAY				FLOAT(53)		
+							,PDProd_BOEPerDAY					FLOAT(53)		
+							,PDProd_MCFEPerDAY					FLOAT(53)		
+							,PDRepGas_MCFPerDAY					FLOAT(53)		
+							,PDWater_BBLPerDAY					FLOAT(53)		
+							,Prod_BOE							FLOAT(53)		
+							,Prod_CondensateBBL					REAL			
+							,Prod_MCFE							FLOAT(53)		
+							,Prod_OilBBL						FLOAT(53)		
+							,ProducingDays						FLOAT(53)		
+							,ProducingMonth						DATETIME		
+							,ProducingOperator					VARCHAR(256)	
+							,ProductionID						BIGINT			
+							,ProductionReportedMethod			VARCHAR(16)		
+							,RepGasProd_MCF						REAL			
+							,StateProvince						VARCHAR(64) 	
+							,TotalCompletionMonths				INT		  		
+							,TotalProdMonths					INT		  		
+							,UpdatedDate						DATETIME		
+							,WaterProd_BBL						FLOAT(53)		
+							,WellID								BIGINT			
+
+							--,ETL_Load_Date		DATETIME
+						) t0
+
+					SET @ErrPos += concat(' [ ',@@rowcount,' ]')
+					PRINT concat(sysdatetime(),' | INFO | '+@ErrPos)
+
+				--------------------------------------------------------------------
+				-- Validate Production data
+				--------------------------------------------------------------------
+					SET @ErrPos = concat(@MsgTitle, '; Validate Production data')
+					PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+					
+					UPDATE #Production SET 
+						 _delete	= coalesce(_delete, 0)
+						,_error		= CASE 
+										-- Set error true if duplicate detected
+										WHEN _duplicate = 1 THEN 1
+										
+										-- Set error true if ProductionID is null or empty string
+										WHEN ProductionID IS NULL OR ProductionID = '' THEN 1
+										ELSE 0
+									  END
+						,_message	=   -- Add error message duplicate detected
+									+ CASE WHEN _duplicate = 1 THEN '[ERROR: There were one or more records with the same ProductionID this record will be ignored ( '+ProductionID+')];' ELSE '' END
+									+ CASE WHEN ProductionID IS NULL OR ProductionID = '' THEN '[ERROR: ProductionID cannot be null or empty string)];' ELSE '' END
+								
+					
+					SET @ErrPos += concat(' [ ',@@rowcount,' ]')
+					PRINT concat(sysdatetime(),' | INFO | '+@ErrPos)
+
+				--------------------------------------------------------------------
+				-- Save data to data.Production
+				--------------------------------------------------------------------
+					SET @ErrPos = concat(@MsgTitle, '; Save data to data.Production')
+					PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+					----------------------------------------------------------------
+					-- Process Deletes
+					----------------------------------------------------------------
+						SET @ErrPos = concat(@MsgTitle, '; Save data to data.Production; Process Deletes')
+						PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+						DELETE t0
+						FROM
+							data.Production t0
+
+							INNER JOIN #Production t1
+							   ON t0.ProductionID = t1.ProductionID
+							  
+						
+						WHERE 1=1
+							AND t1.DeletedDate is null
+							AND t1._delete = 1
+							AND t1._error = 0
+
+						SET @ErrPos += concat(' [ ',@@rowcount,' ]')
+						PRINT concat(sysdatetime(),' | INFO | '+@ErrPos)
+
+					----------------------------------------------------------------
+					-- Process Updates
+					----------------------------------------------------------------
+						SET @ErrPos = concat(@MsgTitle, '; Save data to data.Production; Process Updates')
+						PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+						UPDATE t0 SET	
+							 API_UWI						= t1.API_UWI						
+							,API_UWI_Unformatted			= t1.API_UWI_Unformatted			
+							,API_UWI_14						= t1.API_UWI_14						
+							,API_UWI_14_Unformatted			= t1.API_UWI_14_Unformatted			
+							,CDFlaredGas_MCFPerDAY			= t1.CDFlaredGas_MCFPerDAY			
+							,CDGas_MCFPerDAY				= t1.CDGas_MCFPerDAY				
+							,CDInjectionGas_MCFPerDAY		= t1.CDInjectionGas_MCFPerDAY		
+							,CDInjectionOther_BBLPerDAY		= t1.CDInjectionOther_BBLPerDAY		
+							,CDInjectionSolvent_BBLPerDAY	= t1.CDInjectionSolvent_BBLPerDAY	
+							,CDInjectionSteam_BBLPerDAY		= t1.CDInjectionSteam_BBLPerDAY		
+							,CDInjectionWater_BBLPerDAY		= t1.CDInjectionWater_BBLPerDAY		
+							,CDLiquids_BBLPerDAY			= t1.CDLiquids_BBLPerDAY			
+							,CDProd_BOEPerDAY				= t1.CDProd_BOEPerDAY				
+							,CDProd_MCFEPerDAY				= t1.CDProd_MCFEPerDAY				
+							,CDRepGas_MCFPerDAY				= t1.CDRepGas_MCFPerDAY				
+							,CDWater_BBLPerDAY				= t1.CDWater_BBLPerDAY				
+							,CompletionID					= t1.CompletionID					
+							,Country						= t1.Country						
+							,County							= t1.County							
+							,CumFlaredGas_MCF				= t1.CumFlaredGas_MCF				
+							,CumGas_MCF						= t1.CumGas_MCF						
+							,CumLiquids_BBL					= t1.CumLiquids_BBL					
+							,CumProd_BOE					= t1.CumProd_BOE					
+							,CumProd_MCFE					= t1.CumProd_MCFE					
+							,CumRepGas_MCF					= t1.CumRepGas_MCF					
+							,CumWater_BBL					= t1.CumWater_BBL					
+							,DeletedDate					= t1.DeletedDate					
+							,ENVBasin						= t1.ENVBasin						
+							,ENVInterval					= t1.ENVInterval					
+							,ENVPlay						= t1.ENVPlay						
+							,ENVProdID						= t1.ENVProdID						
+							,ENVRegion						= t1.ENVRegion						
+							,FlaredGasProd_MCF				= t1.FlaredGasProd_MCF				
+							,GasProd_MCF					= t1.GasProd_MCF					
+							,InjectionGas_MCF				= t1.InjectionGas_MCF				
+							,InjectionOther_BBL				= t1.InjectionOther_BBL				
+							,InjectionSolvent_BBL			= t1.InjectionSolvent_BBL			
+							,InjectionSteam_BBL				= t1.InjectionSteam_BBL				
+							,InjectionWater_BBL				= t1.InjectionWater_BBL				
+							,LiquidsProd_BBL				= t1.LiquidsProd_BBL				
+							,PDFlaredGas_MCFPerDAY			= t1.PDFlaredGas_MCFPerDAY			
+							,PDGas_MCFPerDAY				= t1.PDGas_MCFPerDAY				
+							,PDLiquids_BBLPerDAY			= t1.PDLiquids_BBLPerDAY			
+							,PDProd_BOEPerDAY				= t1.PDProd_BOEPerDAY				
+							,PDProd_MCFEPerDAY				= t1.PDProd_MCFEPerDAY				
+							,PDRepGas_MCFPerDAY				= t1.PDRepGas_MCFPerDAY				
+							,PDWater_BBLPerDAY				= t1.PDWater_BBLPerDAY				
+							,Prod_BOE						= t1.Prod_BOE						
+							,Prod_CondensateBBL				= t1.Prod_CondensateBBL				
+							,Prod_MCFE						= t1.Prod_MCFE						
+							,Prod_OilBBL					= t1.Prod_OilBBL					
+							,ProducingDays					= t1.ProducingDays					
+							,ProducingMonth					= t1.ProducingMonth					
+							,ProducingOperator				= t1.ProducingOperator				
+							,ProductionID					= t1.ProductionID					
+							,ProductionReportedMethod		= t1.ProductionReportedMethod		
+							,RepGasProd_MCF					= t1.RepGasProd_MCF					
+							,StateProvince					= t1.StateProvince					
+							,TotalCompletionMonths			= t1.TotalCompletionMonths			
+							,TotalProdMonths				= t1.TotalProdMonths				
+							,UpdatedDate					= t1.UpdatedDate					
+							,WaterProd_BBL					= t1.WaterProd_BBL					
+							,WellID							= t1.WellID											
+
+
+							--,ETL_Load_Date				= t1.ETL_Load_Date
+
+						FROM
+							data.Production t0
+
+							INNER JOIN #Production t1
+								ON t0.ProductionID = t1.ProductionID
+
+						WHERE 1=1
+							AND t1._delete = 0
+							AND t1._error = 0
+
+					SET @ErrPos += concat(' [ ',@@rowcount,' ]')
+					PRINT concat(sysdatetime(),' | INFO | '+@ErrPos)
+
+					----------------------------------------------------------------
+					-- Process Inserts
+					----------------------------------------------------------------
+						SET @ErrPos = concat(@MsgTitle, '; Save data to data.Production; Process Inserts')
+						PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+						INSERT INTO data.Production ( 
+							 API_UWI						
+							,API_UWI_Unformatted			
+							,API_UWI_14						
+							,API_UWI_14_Unformatted			
+							,CDFlaredGas_MCFPerDAY			
+							,CDGas_MCFPerDAY				
+							,CDInjectionGas_MCFPerDAY		
+							,CDInjectionOther_BBLPerDAY		
+							,CDInjectionSolvent_BBLPerDAY	
+							,CDInjectionSteam_BBLPerDAY		
+							,CDInjectionWater_BBLPerDAY		
+							,CDLiquids_BBLPerDAY			
+							,CDProd_BOEPerDAY				
+							,CDProd_MCFEPerDAY				
+							,CDRepGas_MCFPerDAY				
+							,CDWater_BBLPerDAY				
+							,CompletionID					
+							,Country						
+							,County							
+							,CumFlaredGas_MCF				
+							,CumGas_MCF						
+							,CumLiquids_BBL					
+							,CumProd_BOE					
+							,CumProd_MCFE					
+							,CumRepGas_MCF					
+							,CumWater_BBL					
+							,DeletedDate					
+							,ENVBasin						
+							,ENVInterval					
+							,ENVPlay						
+							,ENVProdID						
+							,ENVRegion						
+							,FlaredGasProd_MCF				
+							,GasProd_MCF					
+							,InjectionGas_MCF				
+							,InjectionOther_BBL				
+							,InjectionSolvent_BBL			
+							,InjectionSteam_BBL				
+							,InjectionWater_BBL				
+							,LiquidsProd_BBL				
+							,PDFlaredGas_MCFPerDAY			
+							,PDGas_MCFPerDAY				
+							,PDLiquids_BBLPerDAY			
+							,PDProd_BOEPerDAY				
+							,PDProd_MCFEPerDAY				
+							,PDRepGas_MCFPerDAY				
+							,PDWater_BBLPerDAY				
+							,Prod_BOE						
+							,Prod_CondensateBBL				
+							,Prod_MCFE						
+							,Prod_OilBBL					
+							,ProducingDays					
+							,ProducingMonth					
+							,ProducingOperator				
+							,ProductionID					
+							,ProductionReportedMethod		
+							,RepGasProd_MCF					
+							,StateProvince					
+							,TotalCompletionMonths			
+							,TotalProdMonths				
+							,UpdatedDate					
+							,WaterProd_BBL					
+							,WellID														 
+					
+							,ETL_Load_Date
+							)
+						SELECT					
+							 API_UWI						= t0.API_UWI						
+							,API_UWI_Unformatted			= t0.API_UWI_Unformatted			
+							,API_UWI_14						= t0.API_UWI_14						
+							,API_UWI_14_Unformatted			= t0.API_UWI_14_Unformatted			
+							,CDFlaredGas_MCFPerDAY			= t0.CDFlaredGas_MCFPerDAY			
+							,CDGas_MCFPerDAY				= t0.CDGas_MCFPerDAY				
+							,CDInjectionGas_MCFPerDAY		= t0.CDInjectionGas_MCFPerDAY		
+							,CDInjectionOther_BBLPerDAY		= t0.CDInjectionOther_BBLPerDAY		
+							,CDInjectionSolvent_BBLPerDAY	= t0.CDInjectionSolvent_BBLPerDAY	
+							,CDInjectionSteam_BBLPerDAY		= t0.CDInjectionSteam_BBLPerDAY		
+							,CDInjectionWater_BBLPerDAY		= t0.CDInjectionWater_BBLPerDAY		
+							,CDLiquids_BBLPerDAY			= t0.CDLiquids_BBLPerDAY			
+							,CDProd_BOEPerDAY				= t0.CDProd_BOEPerDAY				
+							,CDProd_MCFEPerDAY				= t0.CDProd_MCFEPerDAY				
+							,CDRepGas_MCFPerDAY				= t0.CDRepGas_MCFPerDAY				
+							,CDWater_BBLPerDAY				= t0.CDWater_BBLPerDAY				
+							,CompletionID					= t0.CompletionID					
+							,Country						= t0.Country						
+							,County							= t0.County							
+							,CumFlaredGas_MCF				= t0.CumFlaredGas_MCF				
+							,CumGas_MCF						= t0.CumGas_MCF						
+							,CumLiquids_BBL					= t0.CumLiquids_BBL					
+							,CumProd_BOE					= t0.CumProd_BOE					
+							,CumProd_MCFE					= t0.CumProd_MCFE					
+							,CumRepGas_MCF					= t0.CumRepGas_MCF					
+							,CumWater_BBL					= t0.CumWater_BBL					
+							,DeletedDate					= t0.DeletedDate					
+							,ENVBasin						= t0.ENVBasin						
+							,ENVInterval					= t0.ENVInterval					
+							,ENVPlay						= t0.ENVPlay						
+							,ENVProdID						= t0.ENVProdID						
+							,ENVRegion						= t0.ENVRegion						
+							,FlaredGasProd_MCF				= t0.FlaredGasProd_MCF				
+							,GasProd_MCF					= t0.GasProd_MCF					
+							,InjectionGas_MCF				= t0.InjectionGas_MCF				
+							,InjectionOther_BBL				= t0.InjectionOther_BBL				
+							,InjectionSolvent_BBL			= t0.InjectionSolvent_BBL			
+							,InjectionSteam_BBL				= t0.InjectionSteam_BBL				
+							,InjectionWater_BBL				= t0.InjectionWater_BBL				
+							,LiquidsProd_BBL				= t0.LiquidsProd_BBL				
+							,PDFlaredGas_MCFPerDAY			= t0.PDFlaredGas_MCFPerDAY			
+							,PDGas_MCFPerDAY				= t0.PDGas_MCFPerDAY				
+							,PDLiquids_BBLPerDAY			= t0.PDLiquids_BBLPerDAY			
+							,PDProd_BOEPerDAY				= t0.PDProd_BOEPerDAY				
+							,PDProd_MCFEPerDAY				= t0.PDProd_MCFEPerDAY				
+							,PDRepGas_MCFPerDAY				= t0.PDRepGas_MCFPerDAY				
+							,PDWater_BBLPerDAY				= t0.PDWater_BBLPerDAY				
+							,Prod_BOE						= t0.Prod_BOE						
+							,Prod_CondensateBBL				= t0.Prod_CondensateBBL				
+							,Prod_MCFE						= t0.Prod_MCFE						
+							,Prod_OilBBL					= t0.Prod_OilBBL					
+							,ProducingDays					= t0.ProducingDays					
+							,ProducingMonth					= t0.ProducingMonth					
+							,ProducingOperator				= t0.ProducingOperator				
+							,ProductionID					= t0.ProductionID					
+							,ProductionReportedMethod		= t0.ProductionReportedMethod		
+							,RepGasProd_MCF					= t0.RepGasProd_MCF					
+							,StateProvince					= t0.StateProvince					
+							,TotalCompletionMonths			= t0.TotalCompletionMonths			
+							,TotalProdMonths				= t0.TotalProdMonths				
+							,UpdatedDate					= t0.UpdatedDate					
+							,WaterProd_BBL					= t0.WaterProd_BBL					
+							,WellID							= t0.WellID							
+						
+
+							,ETL_Load_Date					= t0.ETL_Load_Date				
+						FROM
+							#Production t0
+
+							LEFT OUTER JOIN data.Production t1
+								ON t0.ProductionID = t1.ProductionID
+
+						WHERE 1=1
+							AND t1.ProductionID		IS NULL
+
+							AND t0._delete = 0
+							AND t0._error = 0
+
+					SET @ErrPos += concat(' [ ',@@rowcount,' ]')
+					PRINT concat(sysdatetime(),' | INFO | '+@ErrPos)
+
+				--------------------------------------------------------------------
+				-- Error Output
+				--------------------------------------------------------------------
+					IF @NoOutput = 0
+					BEGIN
+						SET @ErrPos = concat(@MsgTitle, '; Save data to data.Production')
+						PRINT concat(sysdatetime(),' | INFO | ',@ErrPos)
+
+						SELECT 
+							 _row_id
+                            ,_delete
+                            ,_error
+                            ,_message
+
+							,API_UWI						
+							,API_UWI_Unformatted			
+							,API_UWI_14						
+							,API_UWI_14_Unformatted			
+							,CDFlaredGas_MCFPerDAY			
+							,CDGas_MCFPerDAY				
+							,CDInjectionGas_MCFPerDAY		
+							,CDInjectionOther_BBLPerDAY		
+							,CDInjectionSolvent_BBLPerDAY	
+							,CDInjectionSteam_BBLPerDAY		
+							,CDInjectionWater_BBLPerDAY		
+							,CDLiquids_BBLPerDAY			
+							,CDProd_BOEPerDAY				
+							,CDProd_MCFEPerDAY				
+							,CDRepGas_MCFPerDAY				
+							,CDWater_BBLPerDAY				
+							,CompletionID					
+							,Country						
+							,County							
+							,CumFlaredGas_MCF				
+							,CumGas_MCF						
+							,CumLiquids_BBL					
+							,CumProd_BOE					
+							,CumProd_MCFE					
+							,CumRepGas_MCF					
+							,CumWater_BBL					
+							,DeletedDate					
+							,ENVBasin						
+							,ENVInterval					
+							,ENVPlay						
+							,ENVProdID						
+							,ENVRegion						
+							,FlaredGasProd_MCF				
+							,GasProd_MCF					
+							,InjectionGas_MCF				
+							,InjectionOther_BBL				
+							,InjectionSolvent_BBL			
+							,InjectionSteam_BBL				
+							,InjectionWater_BBL				
+							,LiquidsProd_BBL				
+							,PDFlaredGas_MCFPerDAY			
+							,PDGas_MCFPerDAY				
+							,PDLiquids_BBLPerDAY			
+							,PDProd_BOEPerDAY				
+							,PDProd_MCFEPerDAY				
+							,PDRepGas_MCFPerDAY				
+							,PDWater_BBLPerDAY				
+							,Prod_BOE						
+							,Prod_CondensateBBL				
+							,Prod_MCFE						
+							,Prod_OilBBL					
+							,ProducingDays					
+							,ProducingMonth					
+							,ProducingOperator				
+							,ProductionID					
+							,ProductionReportedMethod		
+							,RepGasProd_MCF					
+							,StateProvince					
+							,TotalCompletionMonths			
+							,TotalProdMonths				
+							,UpdatedDate					
+							,WaterProd_BBL					
+							,WellID							
+					
+							,ETL_Load_Date
+						FROM 
+							#Production
+						WHERE 1=1
+							AND _error = 1
+
+						SET @ErrPos += concat(' [ ',@@rowcount,' ]')
+						PRINT concat(sysdatetime(),' | INFO | '+@ErrPos)
+					END
+
+		END TRY
+		BEGIN CATCH
+			-- Errors here are fatal; format and throw exception to caller
+			SET @ErrMsg = concat('Failed to ',@ErrPos,'  { ',error_number(),' } ',error_message())
+			PRINT concat(sysdatetime(),' | *ERR | ',@ErrMsg);
+			THROW 2147483647,@ErrMsg,1;
+		END CATCH	
+		
+		PRINT concat(sysdatetime(),' | INFO | ',@MsgTitle, '; *** Completed ***')
+END

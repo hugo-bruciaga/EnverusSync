@@ -1,0 +1,43 @@
+﻿CREATE TABLE data.[FullDirectionalSurvey](
+	[API_UWI] [VARCHAR](32) NULL,
+	[API_UWI_Unformatted] [VARCHAR](32) NULL,
+	[API_UWI_12] [VARCHAR](32) NULL,
+	[API_UWI_12_Unformatted] [VARCHAR](32) NOT NULL,
+	[Azimuth_DEG] [FLOAT] NULL,
+	[Closure_FT] [TINYINT] NULL,
+	[CoordinateSource] [VARCHAR](64) NULL,
+	[Country] [VARCHAR](2) NULL,
+	[County] [VARCHAR](32) NULL,
+	[Course_FT] [FLOAT] NULL,
+	[DeletedDate] [DATETIME] NULL,
+	[DogLegSeverity_DEGPer100FT] [FLOAT] NULL,
+	[E_W] [FLOAT] NULL,
+	[ENVBasin] [VARCHAR](64) NULL,
+	[ENVInterval] [VARCHAR](128) NULL,
+	[ENVPlay] [VARCHAR](128) NULL,
+	[ENVRegion] [VARCHAR](32) NULL,
+	[GeomXYZ_Point] [GEOMETRY] NULL,
+	[GridX_FT] [FLOAT] NULL,
+	[GridY_FT] [FLOAT] NULL,
+	[Inclination_DEG] [FLOAT] NULL,
+	[Latitude] [FLOAT] NULL,
+	[Longitude] [FLOAT] NULL,
+	[MeasuredDepth_FT] [FLOAT] NULL,
+	[N_S] [FLOAT] NULL,
+	[StateProvince] [VARCHAR](64) NULL,
+	[StationNumber] [BIGINT] NOT NULL,
+	[SubseaElevation_FT] [FLOAT] NULL,
+	[TVD_FT] [FLOAT] NULL,
+	[UpdatedDate] [DATETIME] NULL,
+	[VerticalSection_FT] [TINYINT] NULL,
+	[WellId] [BIGINT] NULL,
+	[X_ECEF] [FLOAT] NULL,
+	[Y_ECEF] [FLOAT] NULL,
+	[Z_ECEF] [FLOAT] NULL,
+	[ETL_Load_Date] [DATETIME] NULL,
+constraint pk_data_FullDirectionalSurvey_API_UWI_12_Unformatted_StationNumber primary key clustered (API_UWI_12_Unformatted, StationNumber)	
+)
+GO
+
+CREATE NONCLUSTERED INDEX [idx_data_FullDirectionalSurvey_API_UWI_12_Unformatted_StationNumber]
+    ON data.[FullDirectionalSurvey](API_UWI_12_Unformatted ASC, StationNumber ASC);
