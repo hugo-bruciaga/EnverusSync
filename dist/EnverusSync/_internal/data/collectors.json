@@ -8,6 +8,6 @@
   "7":{"batch_size": 100000, "src_name": "Foundations_WellboreHeader", "keys": "WellboreID", "filter": "",        "sp": "sync.spSaveWellboreHeader", "filter": "1=1"},
   "8":{"batch_size": 100000, "src_name": "Foundations_WellHeader", "keys": "WellID",                              "sp": "sync.spSaveWellHeader", "filter": "1=1"},
   "9":{"batch_size": 50000, "src_name": "Foundations_Wells", "keys": "CompletionID, WellID", "filter": "",        "sp": "sync.spSaveWell", "filter": "1=1"},
-  "10":{"batch_size": 500000, "src_name": "Foundations_FullDirectionalSurvey", "keys": "API_UWI_12, StationNumber", "sp": "sync.spSaveFullDirectionalSurvey", "filter": "ENVRegion in ('EASTERN','GULF_COAST','PERMIAN','ROCKIES')"},
+  "10":{"batch_size": 100000, "src_name": "Foundations_FullDirectionalSurvey", "keys": "API_UWI_12, StationNumber", "sp": "sync.spSaveFullDirectionalSurvey", "filter": "ENVRegion in ('EASTERN','GULF_COAST','PERMIAN','ROCKIES')"},
   "11":{"batch_size": 100000, "src_name": "Foundations_Production", "keys": "ProductionID", "filter": "",          "sp": "sync.spSaveProduction", "filter": "ENVRegion in ('EASTERN','GULF_COAST','PERMIAN','ROCKIES')"}
 }

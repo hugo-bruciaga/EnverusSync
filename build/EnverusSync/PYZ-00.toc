@@ -1,4 +1,4 @@
-('C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\app\\EnverusSync\\build\\EnverusSync\\PYZ-00.pyz',
+('C:\\Users\\hbadmin\\source\\repos\\EnverusSync\\build\\EnverusSync\\PYZ-00.pyz',
  [('_compat_pickle',
    'C:\\Users\\hbadmin\\AppData\\Local\\Programs\\Python\\Python39\\lib\\_compat_pickle.py',
    'PYMODULE'),

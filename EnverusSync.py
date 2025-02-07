@@ -1,4 +1,4 @@
-# .\pyinstaller --add-data 'C:\Users\hbruciaga\source\repos\EnverusSync\app\EnverusSync\data\EnverusSync.cfg:data' --add-data 'C:\Users\hbruciaga\source\repos\EnverusSync\app\EnverusSync\data\collectors.json:data' EnverusSync.py
+# .\pyinstaller.exe --add-data 'C:\Users\hbadmin\source\repos\EnverusSync\app\EnverusSync\data\EnverusSync.cfg:data' --add-data 'C:\Users\hbadmin\source\repos\EnverusSync\app\EnverusSync\data\collectors.json:data' EnverusSync.py
 # C:\Users\hbruciaga\source\repos\EnverusSync\app\EnverusSync\dist\EnverusSync\EnverusSync.exe Foundations_ActiveRigs
 # C:\Users\hbruciaga\source\repos\EnverusSync\app\EnverusSync\dist\EnverusSync\EnverusSync.exe Foundations_Permits
 
@@ -43,12 +43,11 @@ env_pw = parser.get("database", "env_pw")
 ar_srv = parser.get("database", "ar_srv")
 ar_db = parser.get("database", "ar_db")
 schema_name = parser.get("database", "schema_name")
-rolling_window = parser.get("input", "rolling_window")
-# sync_tables = parser.get("input", "sync_tables")
-sync_tables = ''
+# rolling_window = parser.get("input", "rolling_window")
 log_query = parser.get("input", "log_query")
 write_json_to_file = parser.get("input", "write_json_to_file")
-
+how_long_to_wait = parser.get("input", "how_long_to_wait")
+sync_tables = ''
 
 def db_connect(
         server: str,
@@ -112,52 +111,35 @@ def sp_save(batch_size, table_name, unique_cols, stored_procedure, filter):
     is_empty = False
     batch_index = 0
 
+    sql = (f"SELECT * FROM {schema_name}.{table_name}\n "
+           f" WHERE {filter}\n"
+           f"   AND DeletedDate IS NULL\n"
+
+           )
+    # data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchall()))
+    src_cr.execute(sql)
+    # log_file("records to process:", len(src_cr.execute(sql).fetchall()))
+
     while is_empty is False:
         start_r = time.time()
-
-        if table_name != 'Foundations_FullDirectionalSurvey':
-
-            sql = (f"SELECT * FROM {schema_name}.{table_name}\n "
-                   f" WHERE {filter}\n"
-                   f"   AND DeletedDate IS NULL\n"
-                   f"   AND '{table_name}' = (select dataset from {schema_name}.Dataset_Info where dataset = '{table_name}' and last_updated_date > dateadd(day, {rolling_window}, getdate()))\n"
-                   f" ORDER BY {unique_cols}\n "
-                   f"OFFSET {batch_index} ROWS FETCH NEXT {batch_size} ROWS ONLY\n"
-                   )
-
-        else:
-            print("Foundations_FullDirectionalSurvey is going to be processed by a different script")
-            sql = (f"SELECT * FROM {schema_name}.{table_name}\n "
-                   f" WHERE 1=0")
-            '''
-            sql = (f"SELECT API_UWI,API_UWI_Unformatted,API_UWI_12,API_UWI_12_Unformatted,Azimuth_DEG,Closure_FT,CoordinateSource,Country,County,Course_FT,DeletedDate,DogLegSeverity_DEGPer100FT,E_W,ENVBasin,ENVInterval,ENVPlay,ENVRegion"
-                   # f",GeomXYZ_Point,GridX_FT,GridY_FT"
-                   f",null GridX_FT,null GridY_FT"
-                   f",Inclination_DEG,Latitude,Longitude,MeasuredDepth_FT,N_S,StateProvince,StationNumber,SubseaElevation_FT,TVD_FT,UpdatedDate,VerticalSection_FT,WellId,X_ECEF,Y_ECEF,Z_ECEF"
-                   f" FROM {schema_name}.Foundations_FullDirectionalSurvey\n "
-                   f" WHERE {filter}"
-                   f"   AND DeletedDate IS NULL\n"
-                   f"   AND '{table_name}' = (select dataset from {schema_name}.Dataset_Info where dataset = '{table_name}' and last_updated_date > dateadd(day, {rolling_window}, getdate()))\n"
-                   f" ORDER BY {unique_cols}\n "
-                   f"OFFSET {batch_index} ROWS FETCH NEXT {batch_size} ROWS ONLY\n"
-                   )
-            '''
 
         if log_query == 'Yes':
             log_file(sql)
 
-        data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchall()))
+        batch_index += batch_size
 
-        log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), batch_index, 'Time Elapsed Reading:',
+        results = src_cr.fetchmany(batch_size)
+
+        data = json.dumps(rows_to_dict(results))
+        if not results:
+            break
+
+        log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), format(batch_index, ',d'), 'Time Elapsed Reading:',
                  datetime.timedelta(seconds=time.time() - start_r))
 
         if write_json_to_file == 'Yes':
             with open(f"c:\\temp\\{table_name}_{batch_index}.json", 'w') as f:
                 f.write(f"'{data}'")
-
-        if data == 'null':
-            # if data == 'null' or batch_index == 100000:     # Hugo: Added this in test
-            break
 
         start_w = time.time()
         sql = f"EXEC {stored_procedure} @data=?, @NoOutput=1"
@@ -169,10 +151,8 @@ def sp_save(batch_size, table_name, unique_cols, stored_procedure, filter):
         except Exception as e:
             log_file('Errors Found:', str(e))
 
-        log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), batch_index, 'Time Elapsed Writing:',
+        log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), format(batch_index, ',d'), 'Time Elapsed Writing:',
                  datetime.timedelta(seconds=time.time() - start_w))
-
-        batch_index += batch_size
 
     log_file(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), 'Completed', f'{table_name}')
 
@@ -239,12 +219,14 @@ def sp_counts(table_name, filter):
 
 def main():
     email_content = {}
+    # sync_tables = parser.get("input", "sync_tables")
+
     retcode = 0
     with open(resource_path('data/collectors.json'), 'r') as collectors:
         config = json.load(collectors)
         for v in config.values():
-            # if v['src_name'] in sync_tables:
-            if v['src_name'] in sync_tables:
+            sync_table = v['src_name']
+            if sync_table in sync_tables:
                 try:
                     sp_save(v['batch_size'], v['src_name'], v['keys'], v['sp'], v['filter'])
                     # email_content = email_content + sp_counts(collector.get("src_name"), collector.get("filter"))
@@ -262,22 +244,16 @@ if __name__ == "__main__":
         log_file("------------------------------------------------------------")
         log_file('PROCESSING TABLE:', sync_tables)
         log_file("------------------------------------------------------------")
-        '''
-        ret = main()
-        if ret > 0:
-            sys.exit(1)
-        else:
-            sys.exit(0)
-        '''
+
         try_count = 1
         passed = False
+
         while try_count <= 5 and passed is False:
             ret = main()
-            # ret = main2(try_count)
             if ret == 0:
                 passed = True
             else:
                 passed = False
-                log_file('Failed waiting for 1 hour.')
-                time.sleep(1 * 60 * 60)
+                log_file('Failed waiting for ', how_long_to_wait, 'mins.')
+                time.sleep(float(how_long_to_wait) * 60)
                 try_count += 1

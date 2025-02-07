@@ -5,7 +5,7 @@ a = Analysis(
     ['EnverusSync.py'],
     pathex=[],
     binaries=[],
-    datas=[('C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\app\\EnverusSync\\data\\EnverusSync.cfg', 'data'), ('C:\\Users\\hbruciaga\\source\\repos\\EnverusSync\\app\\EnverusSync\\data\\collectors.json', 'data')],
+    datas=[('C:\\Users\\hbadmin\\source\\repos\\EnverusSync\\app\\EnverusSync\\data\\EnverusSync.cfg', 'data'), ('C:\\Users\\hbadmin\\source\\repos\\EnverusSync\\app\\EnverusSync\\data\\collectors.json', 'data')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
