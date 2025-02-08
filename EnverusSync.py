@@ -118,9 +118,8 @@ def sp_save(batch_size, table_name, unique_cols, stored_procedure, filter):
            f"   AND DeletedDate IS NULL\n"
 
            )
-    # data = json.dumps(rows_to_dict(src_cr.execute(sql).fetchall()))
+
     src_cr.execute(sql)
-    # log_file("records to process:", len(src_cr.execute(sql).fetchall()))
 
     while is_empty is False:
         start_r = time.time()

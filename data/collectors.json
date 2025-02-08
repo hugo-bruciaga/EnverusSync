@@ -1,13 +1,13 @@
 {
-  "1":{"batch_size": 100000, "src_name": "Foundations_ActiveRigs", "keys": "WellID, ENVRigID",                     "sp": "sync.spSaveActiveRig", "filter": "1=1"},
-  "2":{"batch_size": 100000, "src_name": "Foundations_Rigs", "keys": "CompletionID, WellID", "filter": "",        "sp": "sync.spSaveRig", "filter": "1=1"},
+  "1":{"batch_size": 100000, "src_name": "Foundations_ActiveRigs", "keys": "WellID, ENVRigID",                    "sp": "sync.spSaveActiveRig", "filter": "1=1"},
+  "2":{"batch_size": 100000, "src_name": "Foundations_Rigs", "keys": "CompletionID, WellID",                      "sp": "sync.spSaveRig", "filter": "1=1"},
   "3":{"batch_size": 100000, "src_name": "Foundations_LandtracUnits", "keys": "API_UWI_Unformatted",              "sp": "sync.spSaveLandtracUnit", "filter": "1=1"},
   "4":{"batch_size": 100000, "src_name": "Foundations_DrillStemTests", "keys": "WellID, DSTID, FlowID, RecoveryID","sp": "sync.spSaveDrillStemTest", "filter": "1=1"},
   "5":{"batch_size": 100000, "src_name": "Foundations_Permits", "keys": "PermitID",                               "sp": "sync.spSavePermit", "filter": "1=1"},
   "6":{"batch_size": 100000, "src_name": "Foundations_LandtracLeases", "keys": "LeaseID",                         "sp": "sync.spSaveLandtracLease", "filter": "1=1"},
-  "7":{"batch_size": 100000, "src_name": "Foundations_WellboreHeader", "keys": "WellboreID", "filter": "",        "sp": "sync.spSaveWellboreHeader", "filter": "1=1"},
+  "7":{"batch_size": 100000, "src_name": "Foundations_WellboreHeader", "keys": "WellboreID",                      "sp": "sync.spSaveWellboreHeader", "filter": "1=1"},
   "8":{"batch_size": 100000, "src_name": "Foundations_WellHeader", "keys": "WellID",                              "sp": "sync.spSaveWellHeader", "filter": "1=1"},
-  "9":{"batch_size": 50000, "src_name": "Foundations_Wells", "keys": "CompletionID, WellID", "filter": "",        "sp": "sync.spSaveWell", "filter": "1=1"},
+  "9":{"batch_size": 100000, "src_name": "Foundations_Wells", "keys": "CompletionID, WellID",                      "sp": "sync.spSaveWell", "filter": "1=1"},
   "10":{"batch_size": 100000, "src_name": "Foundations_FullDirectionalSurvey", "keys": "API_UWI_12, StationNumber", "sp": "sync.spSaveFullDirectionalSurvey", "filter": "ENVRegion in ('EASTERN','GULF_COAST','PERMIAN','ROCKIES')"},
-  "11":{"batch_size": 100000, "src_name": "Foundations_Production", "keys": "ProductionID", "filter": "",          "sp": "sync.spSaveProduction", "filter": "ENVRegion in ('EASTERN','GULF_COAST','PERMIAN','ROCKIES')"}
+  "11":{"batch_size": 100000, "src_name": "Foundations_Production", "keys": "ProductionID",                       "sp": "sync.spSaveProduction", "filter": "ENVRegion in ('EASTERN','GULF_COAST','PERMIAN','ROCKIES')"}
 }
